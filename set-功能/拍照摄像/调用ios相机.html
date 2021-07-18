@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <!-- 使页面适配手机屏幕 -->
+  <meta name="viewport"
+    content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title></title>
+  <!-- 引入JQuery的JS文件 -->
+  <script src="https://libs.baidu.com/jquery/1.11.1/jquery.min.js"></script>
+  <script src="https://cdn.bootcss.com/vConsole/3.3.4/vconsole.min.js"></script>
+  <script>
+    // 初始化
+    var vConsole = new VConsole();
+    console.log('Hello world');
+  </script>
+</head>
+
+<body>
+  <!-- 这里是通过点击某个Div来隐式创建一个 input 控件，然后实现直接访问相机的功能。-->
+  <div id="demoForClick">
+    <div id="btnID">直接获取iOS相机功能</div>
+  </div>
+  <!-- 换行 -->
+  <br /><br /><br />
+  <div>
+    <!-- 直接访问相机功能进行拍照 -->
+    <label>照相机</label>
+    <input type="file" id='image' accept="image/*" capture='camera'>
+  </div>
+  <!-- 换行 -->
+  <br /><br /><br />
+  <div>
+    <!-- 直接唤起摄像头进行录像 -->
+    <label>摄像机</label>
+    <input type="file" id='video' accept="video/*" capture='camcorder'>
+  </div>
+  <br /><br /><br />
+  <div>
+    <label>刷新</label>
+    <input id="reload" type="button" value="点击刷新">
+  </div>
+
+  <!-- 换行 -->
+  <br /><br /><br />
+  <video src=""></video>
+  <script>
+    // 隐式创建一个input控件，然后实现直接访问相册
+    var inputUploadObj = '';
+    $("#btnID").on("click", function () {
+      inputUploadObj = document.createElement('input')
+      inputUploadObj.setAttribute('id', 'input_upload_ID');
+      inputUploadObj.setAttribute('type', 'file');
+      // 添加这个属性，就可以唤起相机的功能
+      inputUploadObj.setAttribute('capture', 'camera');
+      // 这里如果不加属性 accept 是 "image/*" 或者 "video/*"，就默认打开摄像头，既可以拍照也可以录像
+      inputUploadObj.setAttribute('accept', 'image/*');
+      inputUploadObj.setAttribute("style", 'visibility:hidden');
+      // 这里将创建的隐式input控件拼接到body的最后面，会增加页面的长度，所以要在适当的时候，移除掉这个隐式创建的input控件
+      document.body.appendChild(inputUploadObj);
+      // 这里是模拟点击了input控件
+      inputUploadObj.click();
+    });
+
+
+    $('#reload').on('click', function () {
+      window.location.href = window.location.origin + window.location.pathname + '?v=' + parseInt(Math
+        .random() * 1000)
+    })
+
+
+    console.log(navigator.mediaDevices || navigator.webkitGetUserMedia || navigator.mozGetUserMedia)
+
+    // Older browsers might not implement mediaDevices at all, so we set an empty object first
+    if (navigator.mediaDevices === undefined) {
+      navigator.mediaDevices = {};
+    }
+
+    // Some browsers partially implement mediaDevices. We can't just assign an object
+    // with getUserMedia as it would overwrite existing properties.
+    // Here, we will just add the getUserMedia property if it's missing.
+    if (navigator.mediaDevices.getUserMedia === undefined) {
+      navigator.mediaDevices.getUserMedia = function (constraints) {
+
+        // First get ahold of the legacy getUserMedia, if present
+        var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+        // Some browsers just don't implement it - return a rejected promise with an error
+        // to keep a consistent interface
+        if (!getUserMedia) {
+          return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+        }
+
+        // Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
+        return new Promise(function (resolve, reject) {
+          getUserMedia.call(navigator, constraints, resolve, reject);
+        });
+      }
+    }
+
+
+    navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true
+      })
+      .then(function (stream) {
+        var video = document.querySelector('video');
+        // Older browsers may not have srcObject
+        if ("srcObject" in video) {
+          video.srcObject = stream;
+        } else {
+          // Avoid using this in new browsers, as it is going away.
+          video.src = window.URL.createObjectURL(stream);
+        }
+        video.onloadedmetadata = function (e) {
+          video.play();
+        };
+      })
+      .catch(function (err) {
+        console.log(err.name + ": " + err.message);
+      });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <textarea name="" id="text" cols="30" rows="10">这里输入的数据将保存为txt中</textarea>
+
+  <button id="save" type="button">保存</button>
+</body>
+<script>
+  document.querySelector('#save').addEventListener('click', saveFile);
+  function fakeClick(obj) {
+    var ev = new MouseEvent("click", {
+      'bubbles': true,
+      'cancelable': false,
+      'view': window,
+      'detail': 0,
+      'screenX': 0,
+      'screenY': 0,
+      'clientX': 0,
+      'clientY': 0,
+      'ctrlKey': false,
+      'altKey': false,
+      'shiftKey': false,
+      'metaKey': false,
+      'button': 0,
+      'relatedTarget': null
+    });
+    obj.dispatchEvent(ev);
+  }
+
+  function exportRaw(name, data) {
+    var urlObject = window.URL || window.webkitURL || window;
+    var export_blob = new Blob([data]);
+    var save_link = document.createElementNS("http://www.w3.org/1999/xhtml", "a")
+    save_link.href = urlObject.createObjectURL(export_blob);
+    save_link.download = name;
+    fakeClick(save_link);
+  }
+
+  function saveFile() {
+    var inValue = document.querySelector('#text').value;
+    exportRaw('test.txt', inValue);
+  }
+</script>
+
+</html>

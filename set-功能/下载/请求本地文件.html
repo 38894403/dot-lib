@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<body>
+
+</body>
+<script>
+  function loadFile() {
+    var contentUrl = "./some.txt";
+    $.ajax({
+      type: "get",
+      url: contentUrl,
+      timeout: 15000,
+      dataType: "html",
+      success: function (data) {
+        console.log('data :', data)
+      },
+      error: function (msg) {
+        alert("网络不给力,请先检查网络！");
+      }
+    });
+  }
+  loadFile()
+</script>
+
+</html>
